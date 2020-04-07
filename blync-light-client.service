@@ -1,0 +1,28 @@
+# This is a systemd startup file if you are on a system that
+# supports systemd and you want blync-light-client to work as an always 
+# on service
+
+# To make this persistent
+# sudo cp blync-light-client.service /etc/systemd/system
+# sudo systemctl enable blync-light-client.service
+# sudo chmod 644 /etc/systemd/system/blync-light-client.service
+# sudo systemctl enable blync-light-client
+
+
+[Unit]
+Description=Blync Light Client Service
+After=multi-user.target
+Conflicts=getty@tty1.service
+
+[Service]
+#Change KillSignal to SIGINT, so the KeyboardInterrupt is caught.
+KillSignal=SIGINT
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=ADD_WORKING_DIR_HERE
+ExecStart=/usr/bin/python3 client.py
+StandardInput=tty-force
+
+[Install]
+WantedBy=multi-user.target

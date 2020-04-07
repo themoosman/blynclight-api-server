@@ -1,0 +1,26 @@
+# This is a systemd startup file if you are on a system that
+# supports systemd and you want blync-light-server to work as an always 
+# on service
+
+# To make this persistent
+# sudo cp blync-light-server.service /etc/systemd/system
+# sudo systemctl enable blync-light-server.service
+# sudo chmod 644 /etc/systemd/system/blync-light-server.service
+# sudo systemctl enable blync-light-server
+
+
+[Unit]
+Description=Blync Light Server Service
+After=multi-user.target
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=ADD_WORKING_DIR_HERE
+ExecStart=/usr/bin/python3 server.py
+StandardInput=tty-force
+
+[Install]
+WantedBy=multi-user.target
