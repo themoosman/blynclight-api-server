@@ -1,11 +1,11 @@
 # BlyncLight API Server
-This is an BlyncLight API Server for the [Embrava BlyncLight](https://embrava.com/collections/blynclight-series).  This is intended to make the BlyncLight a network light and have its status updated by simple Rest calls.  I wrote this server and client so my workstaion (client) can monitor my headset and webcamera and update the light accordingly.  
+This is an BlyncLight API Server for the [Embrava BlyncLight](https://embrava.com/collections/blynclight-series).  This is intended to make the BlyncLight a network light and have its status updated by simple Rest calls.  I wrote this server and client so my workstation (client) can monitor my headset and webcamera and update the light accordingly.
 
 ## Why
 During the shelter in place here in the USA during the COVID-19 outbreak, I was forced to work from home.  This light and client / server become required to signal other family members that I was on a conference call.  I hope this can help you out as well.
 
 ## Requirements
-This application uses the [blynclight](https://pypi.org/project/blynclight/) Python pakcage to make the device calls.
+This application uses the [blynclight](https://pypi.org/project/blynclight/) Python package to make the device calls.
 
 
 ## Server
