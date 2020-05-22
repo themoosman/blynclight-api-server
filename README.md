@@ -49,6 +49,8 @@ Both Python apps can be run as services.  See the instructions in the `.service`
 
 ### config.ini Overview
 
+The repo does not ship with a `config.ini` so you must copy `config-sample.ini` to `config.ini`
+
 The following table outlines the `config.ini` variables.
 
 #### global
@@ -72,7 +74,8 @@ These are the default values for the server and client.  These values can be ove
 | `wait_time` | Sets the poll time |
 | `long_wait_time` | Sets a longer wait time that's used when a headset cann't be located |
 | `webcam_device` | Location to the webcam |
-| `headset_card` | Location to the headset |
+| `headset_status` | Location to the headset status file |
+| `headset_stream` | Location to the headset stream file |
 | `api_server` | URL to the server API |
 
 

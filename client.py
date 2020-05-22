@@ -8,6 +8,7 @@ import os
 import configparser
 import distutils
 import requests
+from os import path
 from flask import json, jsonify
 from distutils import util
 from systemd.journal import JournaldLogHandler
@@ -96,40 +97,49 @@ class BlynclightClient(object):
                 self.appconfig = self.config['app']
                 self.globalconfig = self.config['global']
                 self.logger.setLevel(logging.getLevelName(self.appconfig.get('log_level', self.globalconfig.get('log_level', 'INFO'))))
-                headset = self.appconfig['headset_card']
+                headset = self.appconfig['headset_status']
+                headset_stream = self.appconfig['headset_stream']
                 webcam = self.appconfig['webcam_device']
                 wait_time = int(self.appconfig.get('wait_time', '10'))
                 long_wait_time = int(self.appconfig.get('long_wait_time', '60'))
                 no_headset_wait_time = int(self.appconfig.get('no_headset_wait_time', '60'))
                 use_headset_ctrl = distutils.util.strtobool(self.appconfig.get('use_headset_ctrl', 'True'))
                 api_server = self.appconfig.get('api_server', 'http://localhost:8080/api/v1/')
-
+                skip = False
 
                 #check headset on/off
                 if use_headset_ctrl:
                     self.logger.info("Looking for headset")
-                    stream = os.popen('headsetcontrol -b | grep -i battery | wc -l')
-                    output = stream.read().strip()
-                    #self.logger.debug("0: " + output)
-                    line_count = int(output)
-                    if line_count > 0:
-                        #headset found
-                        self.logger.debug("break 0.0")
-                        self.logger.info("Headset found")
-                        case_value += 1
-                    else:
+                    #stream = os.popen('headsetcontrol -b | grep -i battery | wc -l')
+                    #stream = os.popen('cat ' + headset + ' | grep -i "closed" | wc -l')
+                    if not path.isfile(headset_stream):
+                        self.logger.info("Headset stream file not found")
                         #headset off or not found
                         self.logger.debug("break 0.1")
                         self.logger.info("Headset not found")
+                    else:
+                        self.logger.info("Headset stream file found")
+                        stream = os.popen('cat ' + headset + ' | grep -i "closed" | wc -l')
+                        self.logger.debug("0.0: ")
+                        output = stream.read().strip()
+                        self.logger.debug("0:lc " + output)
+                        line_count = int(output)
+                        if line_count < 2:
+                            #headset found
+                            self.logger.debug("break 0.0")
+                            self.logger.info("Headset found without active status")
+                            case_value += 1
+                        else:
+                            self.logger.info("Headset status showed as closed")
                 else:
-                    case_value += 1
+                    skip = True
 
                 self.logger.debug("case_value: " + str(case_value))
 
                 #check headset activity only if it was found above or check is skipped.
-                if case_value > 0:
+                if case_value > 0 or skip:
                     self.logger.info("Checking for headset activity")
-                    stream = os.popen('cat ' + headset + ' | grep "RUNNING" | wc -l')
+                    stream = os.popen('cat ' + headset + ' | grep -i "RUNNING" | wc -l')
                     output = stream.read().strip()
                     #self.logger.debug("1: " + output)
                     line_count = int(output)
@@ -141,6 +151,8 @@ class BlynclightClient(object):
                         self.logger.debug("break 1.1")
                         self.logger.info("Headset is active")
                         case_value += 1
+                        case_value += 1
+                    if skip:
                         case_value += 1
                     self.logger.debug("case_value: " + str(case_value))
                 
