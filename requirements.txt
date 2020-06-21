@@ -1,3 +1,4 @@
 systemd
-blynclight
-Flask
+blynclight >= 0.7.1
+Flask >= 1.1.2
+flake8 >= 3.8.3
