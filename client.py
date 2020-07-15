@@ -64,13 +64,7 @@ class BlynclightClient(object):
             log_file = self.appconfig.get('client_log_file')
             #log_level = logging.INFO
 
-            journald_handler = JournaldLogHandler()
-            use_journal = self.appconfig.getboolean('use_journald', self.globalconfig.getboolean('use_journald', False))
-            if use_journal:
-                journald_handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
-                self.logger.addHandler(journald_handler)
-                self.logger.setLevel(log_level)
-            elif "TTY" in os.environ:
+            if "TTY" in os.environ:
                 logging.basicConfig(format=log_fmt, datefmt=log_datefmt, level=log_level)
             else:
                 if sys.stdout.isatty():

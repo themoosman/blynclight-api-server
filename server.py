@@ -10,7 +10,7 @@ from flask_restful import abort
 from functools import wraps
 
 
-from systemd.journal import JournaldLogHandler
+#from systemd.journal import JournaldLogHandler
 
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
@@ -174,13 +174,7 @@ if __name__ == "__main__":
     log_level = logging.getLevelName(serverconfig.get('log_level', globalconfig.get('log_level', 'INFO')))
     log_file = serverconfig.get('server_log_file')
 
-    journald_handler = JournaldLogHandler()
-    use_journal = serverconfig.getboolean('use_journald', globalconfig.getboolean('use_journald', False))
-    if use_journal:
-        journald_handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
-        logger.addHandler(journald_handler)
-        logger.setLevel(log_level)
-    elif "TTY" in os.environ:
+    if "TTY" in os.environ:
         logging.basicConfig(format=log_fmt, datefmt=log_datefmt, level=log_level)
     else:
         if sys.stdout.isatty():
