@@ -91,7 +91,7 @@ def flash():
 
         b = request.json.get('flash', False)
         logger.debug("flash: " + str(b))
-        light.flash = int(b == True)
+        light.flash = int(b)
 
     j = "{'" + key + "': " + json.dumps(bool(light.flash)) + "}"
     response = jsonify(j)
