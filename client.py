@@ -6,9 +6,9 @@ import sys
 import traceback
 import os
 import configparser
-import distutils
 import requests
 from os import path
+from distutils import util
 from flask import json
 
 
@@ -96,7 +96,7 @@ class BlynclightClient(object):
                 wait_time = int(self.appconfig.get('wait_time', '10'))
                 long_wait_time = int(self.appconfig.get('long_wait_time', '60'))
                 no_headset_wait_time = int(self.appconfig.get('no_headset_wait_time', '60'))
-                use_headset_ctrl = distutils.util.strtobool(self.appconfig.get('use_headset_ctrl', 'True'))
+                use_headset_ctrl = util.strtobool(self.appconfig.get('use_headset_ctrl', 'True'))
                 api_server = self.appconfig.get('api_server', 'http://localhost:8080/api/v1/')
                 skip = False
 
