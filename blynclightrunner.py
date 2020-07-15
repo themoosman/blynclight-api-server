@@ -2,24 +2,24 @@
 
 from threading import Lock, Thread
 import time
-import logging
-import platform
 from blynclight import BlyncLight
+
 
 class BlyncLightRunner:
     """Wrapper of BlyncLight with threadding."""
-    red, blue, green, yellow, magenta, cyan, silver, blank = (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255), (255, 255, 0), (0, 255, 255), (128, 128, 128), (0, 0, 0)
-    
+    red, blue, green, yellow, magenta, cyan, silver, blank = (255, 0, 0), (0, 255, 0), (
+        0, 0, 255), (255, 0, 255), (255, 255, 0), (0, 255, 255), (128, 128, 128), (0, 0, 0)
+
     def __init__(self, logger, color=(0, 0, 0), flash=0, flash_speed=4, dim=False):
-        self.__blight=BlyncLight.get_light()
-        self.__logger=logger
+        self.__blight = BlyncLight.get_light()
+        self.__logger = logger
         self.__mutex = Lock()
-        self.__color=color
-        self.__flash=flash
-        self.__flash_speed=flash_speed
-        self.__dim=dim
-        self.__on=False
-    
+        self.__color = color
+        self.__flash = flash
+        self.__flash_speed = flash_speed
+        self.__dim = dim
+        self.__on = False
+
     @property
     def colorname(self):
         """Get the string representation of the color
@@ -62,7 +62,7 @@ class BlyncLightRunner:
         if self.__on == value:
             return
         if value:
-            t = Thread(target = self.run_light)
+            t = Thread(target=self.run_light)
             t.start()
         else:
             self.__on = value
@@ -126,13 +126,13 @@ class BlyncLightRunner:
 
         self.__light.color = self.color
         self.logger.debug("Setting light color to: " + self.colorname)
-        
+
         self.__light.flash = self.flash
         self.logger.debug("Setting light flash to: " + str(self.flash))
-        
+
         self.__light.speed = self.flashspeed
         self.logger.debug("setting light flashspeed to: " + str(self.flashspeed))
-        
+
         self.__light.dim = self.dim
         self.logger.debug("Setting light dim value to: " + str(self.dim))
 
@@ -161,7 +161,6 @@ class BlyncLightRunner:
         else:
             return 'blank'
 
-
     def __colortuple(self, color_name):
         if color_name == 'red':
             return self.red
@@ -180,7 +179,7 @@ class BlyncLightRunner:
         else:
             self.logger.debug("no color found, returning blank")
             return self.blank
-    
+
     def run_light(self):
         self.__lock.acquire()
         self.__on = True
@@ -193,7 +192,7 @@ class BlyncLightRunner:
             self.__light.immediate = True
             while(self.on):
                 if reload_int > 10:
-                    #self.reload_light_settings()
+                    # self.reload_light_settings()
                     self.print_light_settings()
                     reload_int = 0
                 time.sleep(1)

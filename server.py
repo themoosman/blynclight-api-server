@@ -9,9 +9,6 @@ from flask import Flask, jsonify, request, json
 from flask_restful import abort
 from functools import wraps
 
-
-#from systemd.journal import JournaldLogHandler
-
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 light = BlyncLightRunner(logger)
