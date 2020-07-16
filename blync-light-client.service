@@ -1,4 +1,3 @@
-# This is a systemd startup file if you are on a system that
 # supports systemd and you want blync-light-client to work as an always 
 # on service
 
@@ -15,6 +14,8 @@ After=multi-user.target
 Conflicts=getty@tty1.service
 
 [Service]
+# We need this to get logs correctly
+Environment=PYTHONUNBUFFERED=1
 #Change KillSignal to SIGINT, so the KeyboardInterrupt is caught.
 KillSignal=SIGINT
 Type=simple

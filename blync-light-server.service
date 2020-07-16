@@ -15,12 +15,16 @@ After=multi-user.target
 Conflicts=getty@tty1.service
 
 [Service]
+# We need this to get logs correctly
+Environment=PYTHONUNBUFFERED=1
+#Change KillSignal to SIGINT, so the KeyboardInterrupt is caught.
+KillSignal=SIGINT
 Type=simple
 Restart=always
 RestartSec=10
 WorkingDirectory=ADD_WORKING_DIR_HERE
 ExecStart=/usr/bin/python3 server.py
-StandardInput=tty-force
+#StandardInput=tty-force
 
 [Install]
 WantedBy=multi-user.target
