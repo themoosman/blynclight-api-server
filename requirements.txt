@@ -2,3 +2,4 @@ blynclight >= 0.7.1
 Flask >= 1.1.2
 flake8 >= 3.8.3
 flask_restful >= 0.3.8
+configparser >= 5.0.0
