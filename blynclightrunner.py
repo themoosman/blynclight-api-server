@@ -182,14 +182,10 @@ class BlyncLightRunner:
         self.logger.debug("lock acquired")
         reload_int = 0
         try:
-            # self.__light.immediate = False
             self.update_light()
-            # self.__light.on = True
-            # self.__light.immediate = True
-            # with self.__light.batch_update():
-            self.__light.color = self.red
-            self.__light.on = True
-            self.__light.write()
+            with self.__light.batch_update():
+                self.__light.reset(flush=True)
+                self.__light.on(color=self.color())
 
             while(self.on):
                 if reload_int > 10:
@@ -200,6 +196,6 @@ class BlyncLightRunner:
                 reload_int += 1
         finally:
             self.on = False
-            self.__light.on = False
+            self.__light.off()
             self.logger.debug("lock released")
             self.__lock.release()
