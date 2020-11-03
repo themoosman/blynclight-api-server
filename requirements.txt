@@ -1,4 +1,4 @@
-blynclight >= 0.7.1
+busylight-for-humans >= 0.7.6
 Flask >= 1.1.2
 flake8 >= 3.8.3
 flask_restful >= 0.3.8

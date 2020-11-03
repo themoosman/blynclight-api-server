@@ -2,7 +2,7 @@
 
 from threading import Lock, Thread
 import time
-from blynclight import BlyncLight
+from busylight.lights.embrava import Blynclight
 
 
 class BlyncLightRunner:
@@ -11,7 +11,7 @@ class BlyncLightRunner:
         0, 0, 255), (255, 0, 255), (255, 255, 0), (0, 255, 255), (128, 128, 128), (0, 0, 0)
 
     def __init__(self, logger, color=(0, 0, 0), flash=0, flash_speed=4, dim=False):
-        self.__blight = BlyncLight.get_light()
+        self.__blight = Blynclight.first_light()
         self.__logger = logger
         self.__mutex = Lock()
         self.__color = color
@@ -102,11 +102,7 @@ class BlyncLightRunner:
             self.reload_light_settings()
 
     @property
-    def __light(self):
-        return self.__blight
-
-    @property
-    def blight(self):
+    def __light(self) -> Blynclight:
         return self.__blight
 
     @property
@@ -114,7 +110,7 @@ class BlyncLightRunner:
         return self.__logger
 
     @property
-    def __lock(self):
+    def __lock(self) -> Lock:
         return self.__mutex
 
     def reload_light_settings(self):
@@ -186,10 +182,15 @@ class BlyncLightRunner:
         self.logger.debug("lock acquired")
         reload_int = 0
         try:
-            self.__light.immediate = False
+            # self.__light.immediate = False
             self.update_light()
+            # self.__light.on = True
+            # self.__light.immediate = True
+            # with self.__light.batch_update():
+            self.__light.color = self.red
             self.__light.on = True
-            self.__light.immediate = True
+            self.__light.write()
+
             while(self.on):
                 if reload_int > 10:
                     # self.reload_light_settings()
