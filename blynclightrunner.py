@@ -7,8 +7,8 @@ from busylight.lights.embrava import Blynclight
 
 class BlyncLightRunner:
     """Wrapper of BlyncLight with threadding."""
-    red, blue, green, yellow, magenta, cyan, silver, blank = (255, 0, 0), (0, 255, 0), (
-        0, 0, 255), (255, 0, 255), (255, 255, 0), (0, 255, 255), (128, 128, 128), (0, 0, 0)
+    red, blue, green, yellow, magenta, cyan, silver, blank = (255, 0, 0), (0, 0, 255), (
+        0, 255, 0), (255, 255, 0), (255, 0, 255), (0, 255, 255), (128, 128, 128), (0, 0, 0)
 
     def __init__(self, logger, color=(0, 0, 0), flash=0, flash_speed=4, dim=False):
         self.__blight = Blynclight.first_light()
@@ -19,6 +19,7 @@ class BlyncLightRunner:
         self.__flash_speed = flash_speed
         self.__dim = dim
         self.__on = False
+        self.stop_light()
 
     @property
     def colorname(self):
@@ -65,7 +66,7 @@ class BlyncLightRunner:
             t = Thread(target=self.run_light)
             t.start()
         else:
-            self.__on = value
+            self.stop_light()
             time.sleep(1)
 
     @property
@@ -118,23 +119,26 @@ class BlyncLightRunner:
         self.update_light()
 
     def update_light(self):
-        self.logger.debug("Light is: " + str(self.on))
+        with self.__light.batch_update():
+            self.logger.debug("Light is: " + str(self.on))
 
-        self.__light.color = self.color
-        self.logger.debug("Setting light color to: " + self.colorname)
+            self.__light.color = self.color
+            self.logger.debug("Setting light color to: " + self.colorname)
+            self.logger.debug("Setting light color to: " + str(self.color))
 
-        self.__light.flash = self.flash
-        self.logger.debug("Setting light flash to: " + str(self.flash))
+            self.__light.flash = self.flash
+            self.logger.debug("Setting light flash to: " + str(self.flash))
 
-        self.__light.speed = self.flashspeed
-        self.logger.debug("setting light flashspeed to: " + str(self.flashspeed))
+            self.__light.speed = self.flashspeed
+            self.logger.debug("setting light flashspeed to: " + str(self.flashspeed))
 
-        self.__light.dim = self.dim
-        self.logger.debug("Setting light dim value to: " + str(self.dim))
+            self.__light.dim = self.dim
+            self.logger.debug("Setting light dim value to: " + str(self.dim))
 
     def print_light_settings(self):
         self.logger.debug("Light is: " + str(self.on))
         self.logger.debug("Light color value: " + self.colorname)
+        self.logger.debug("Light color tuple values: " + str(self.color))
         self.logger.debug("Light flash value: " + str(self.flash))
         self.logger.debug("Light flashspeed value: " + str(self.flashspeed))
         self.logger.debug("Light dim value: " + str(self.dim))
@@ -176,6 +180,9 @@ class BlyncLightRunner:
             self.logger.debug("no color found, returning blank")
             return self.blank
 
+    def stop_light(self):
+        self.__light.off()
+
     def run_light(self):
         self.__lock.acquire()
         self.__on = True
@@ -183,19 +190,19 @@ class BlyncLightRunner:
         reload_int = 0
         try:
             self.update_light()
+            self.logger.debug("Lock noop")
             with self.__light.batch_update():
                 self.__light.reset(flush=True)
-                self.__light.on(color=self.color())
+                self.__light.on(color=self.color)
 
             while(self.on):
                 if reload_int > 10:
-                    # self.reload_light_settings()
                     self.print_light_settings()
                     reload_int = 0
                 time.sleep(1)
                 reload_int += 1
         finally:
             self.on = False
-            self.__light.off()
+            self.stop_light()
             self.logger.debug("lock released")
             self.__lock.release()
