@@ -66,6 +66,7 @@ class BlyncLightRunner:
             t = Thread(target=self.run_light)
             t.start()
         else:
+            self.logger.debug("setting light to off")
             self.stop_light()
             time.sleep(1)
 
@@ -181,16 +182,17 @@ class BlyncLightRunner:
             return self.blank
 
     def stop_light(self):
-        self.__light.off()
+        self.logger.debug("Caught stop_light")
+        self.color = self.blank
+        self.__on = False
 
     def run_light(self):
         self.__lock.acquire()
         self.__on = True
-        self.logger.debug("lock acquired")
+        self.logger.debug("===========lock acquired===========")
         reload_int = 0
         try:
             self.update_light()
-            self.logger.debug("Lock noop")
             with self.__light.batch_update():
                 self.__light.reset(flush=True)
                 self.__light.on(color=self.color)
@@ -203,6 +205,5 @@ class BlyncLightRunner:
                 reload_int += 1
         finally:
             self.on = False
-            self.stop_light()
-            self.logger.debug("lock released")
+            self.logger.debug("===========lock released===========")
             self.__lock.release()

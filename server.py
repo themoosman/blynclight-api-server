@@ -193,14 +193,14 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         try:
             logging.debug("Caught KeyboardInterrupt Exception")
-            light.on(False)
+            light.on = False)
         except Exception:
             logging.critical("Unable to reset light")
             logging.critical("Terminating due to keyboard interrupt")
     except Exception:
         try:
             logging.debug("Caught Exception")
-            light.on(False)
+            light.on = False
         except Exception:
             logging.critical("Unable to reset light")
         logging.critical("Terminating due to unexpected error: %s", sys.exc_info()[0])
