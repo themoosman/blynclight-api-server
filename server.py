@@ -160,31 +160,53 @@ def get_http_exception_handler(app):
 
 # App entry point.
 if __name__ == "__main__":
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    serverconfig = config['server']
-    globalconfig = config['global']
+    try:
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        serverconfig = config['server']
+        globalconfig = config['global']
 
-    # setup logging
-    log_datefmt = '%m-%d-%Y %H:%M:%S'
-    log_fmt = '%(asctime)-15s %(levelname)-8s %(message)s'
-    log_level = logging.getLevelName(serverconfig.get('log_level', globalconfig.get('log_level', 'INFO')))
-    log_file = serverconfig.get('server_log_file')
+        # setup logging
+        log_datefmt = '%m-%d-%Y %H:%M:%S'
+        log_fmt = '%(asctime)-15s %(levelname)-8s %(message)s'
+        log_level = logging.getLevelName(serverconfig.get('log_level', globalconfig.get('log_level', 'INFO')))
+        log_file = serverconfig.get('server_log_file')
 
-    if "TTY" in os.environ:
-        logging.basicConfig(format=log_fmt, datefmt=log_datefmt, level=log_level)
-    else:
-        if sys.stdout.isatty():
-            # Connected to a real terminal - log to stdout
+        if "TTY" in os.environ:
             logging.basicConfig(format=log_fmt, datefmt=log_datefmt, level=log_level)
         else:
-            # Background mode - log to file
-            logging.basicConfig(format=log_fmt, datefmt=log_datefmt, level=log_level, filename=log_file)
+            if sys.stdout.isatty():
+                # Connected to a real terminal - log to stdout
+                logging.basicConfig(format=log_fmt, datefmt=log_datefmt, level=log_level)
+            else:
+                # Background mode - log to file
+                logging.basicConfig(format=log_fmt, datefmt=log_datefmt, level=log_level, filename=log_file)
 
-    logger.info("==========================================================")
-    logger.info("Starting Blync Light Server")
-    # Server Properties
-    app.debug = serverconfig.getboolean('server_debug', False)
-    app.handle_http_exception = get_http_exception_handler(app)
-    # Finally start the web process and list on 8080 all IP addresses
-    app.run(host='0.0.0.0', port=8080)
+        logger.info("==========================================================")
+        logger.info("Starting Blync Light Server")
+        # Server Properties
+        app.debug = serverconfig.getboolean('server_debug', False)
+        app.handle_http_exception = get_http_exception_handler(app)
+        # Finally start the web process and list on 8080 all IP addresses
+        app.run(host='0.0.0.0', port=8080)
+
+    except KeyboardInterrupt:
+        try:
+            logging.debug("Caught KeyboardInterrupt Exception")
+            light.on = False
+        except Exception:
+            logging.critical("Unable to reset light")
+            logging.critical("Terminating due to keyboard interrupt")
+    except Exception:
+        try:
+            logging.debug("Caught Exception")
+            light.on = False
+        except Exception:
+            logging.critical("Unable to reset light")
+        logging.critical("Terminating due to unexpected error: %s", sys.exc_info()[0])
+    finally:
+        try:
+            logging.debug("Caught finally")
+            light.on = False
+        except Exception:
+            logging.critical("Terminating due to unexpected error: %s", sys.exc_info()[0])
