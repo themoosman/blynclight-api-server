@@ -112,12 +112,12 @@ class BlynclightClient(object):
                         self.logger.info("Headset not found")
                     else:
                         self.logger.info("Headset stream file found")
-                        stream = os.popen('cat ' + headset + ' | grep -i "closed" | wc -l')
+                        stream = os.popen('cat ' + headset + ' | grep -i "running" | wc -l')
                         self.logger.debug("0.0: ")
                         output = stream.read().strip()
                         self.logger.debug("0:lc " + output)
                         line_count = int(output)
-                        if line_count < 2:
+                        if line_count >= 1:
                             # headset found
                             self.logger.debug("break 0.0")
                             self.logger.info("Headset found without active status")
@@ -201,9 +201,9 @@ class BlynclightClient(object):
                 elif case_value == 4:
                     # headset found and active, with output and active webcam
                     self.logger.debug("hit case 4")
-                    self.make_rest_call(api_server, 'color_name', {'color_name': 'red'})
                     self.make_rest_call(api_server, 'flash', {'flash': True})
                     self.make_rest_call(api_server, 'speed', {'speed': 4})
+                    self.make_rest_call(api_server, 'color_name', {'color_name': 'red'})
                     self.make_rest_call(api_server, 'on', {'on': True})
                     self.sleep(wait_time)
                     continue
